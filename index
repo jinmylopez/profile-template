@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editor de Plantilla de Perfil</title>
+<style>
+  :root{
+    --green:#1FD673;
+    --dark:#1D212B;
+    --dark-2:#252A36;
+    --purple:#7C4DFF;
+    --lgreen:#22C55E;
+    --blue:#3B82F6;
+    --bg:#0F1115;
+    --panel:#171A21;
+    --panel-2:#1E222C;
+    --text:#EDEFF3;
+    --muted:#8B93A3;
+    --accent-ring: rgba(31,214,115,0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding:40px 24px 80px;
+  }
+  header{
+    text-align:center;
+    margin-bottom:36px;
+  }
+  header h1{
+    font-size:28px;
+    margin:0 0 8px;
+    letter-spacing:-0.02em;
+  }
+  header p{
+    color:var(--muted);
+    margin:0;
+    font-size:15px;
+  }
+  .layout{
+    display:grid;
+    grid-template-columns: 1fr 380px;
+    gap:28px;
+    align-items:flex-start;
+  }
+  @media (max-width: 820px){
+    .layout{grid-template-columns: 1fr;}
+  }
+  .stage{
+    background:var(--panel);
+    border-radius:20px;
+    padding:32px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:20px;
+    border:1px solid #262b36;
+  }
+  .canvas-holder{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    aspect-ratio:1/1.06;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    touch-action:none;
+  }
+  canvas{
+    width:100%;
+    height:100%;
+    cursor:grab;
+    border-radius:12px;
+  }
+  canvas:active{cursor:grabbing;}
+  .hint{
+    font-size:13px;
+    color:var(--muted);
+    text-align:center;
+  }
+  .zoom-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    width:100%;
+    max-width:420px;
+  }
+  .zoom-row label{
+    font-size:13px;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  input[type=range]{
+    flex:1;
+    accent-color: var(--green);
+  }
+  .panel{
+    background:var(--panel);
+    border-radius:20px;
+    padding:28px;
+    border:1px solid #262b36;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    color:var(--muted);
+    margin-bottom:8px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .upload-box{
+    border:1.5px dashed #3a4150;
+    border-radius:14px;
+    padding:22px;
+    text-align:center;
+    cursor:pointer;
+    transition: border-color .15s, background .15s;
+    background:var(--panel-2);
+  }
+  .upload-box:hover, .upload-box.drag{
+    border-color: var(--green);
+    background: var(--accent-ring);
+  }
+  .upload-box svg{
+    margin-bottom:8px;
+    opacity:0.75;
+  }
+  .upload-box .u-title{
+    font-size:14px;
+    font-weight:600;
+  }
+  .upload-box .u-sub{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:4px;
+  }
+  input[type=file]{display:none;}
+  input[type=text]{
+    width:100%;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid #3a4150;
+    background:var(--panel-2);
+    color:var(--text);
+    font-size:15px;
+    font-family:inherit;
+  }
+  input[type=text]:focus{
+    outline:none;
+    border-color:var(--green);
+  }
+  .char-count{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:6px;
+    text-align:right;
+  }
+  button.primary{
+    background:var(--green);
+    color:#04150A;
+    border:none;
+    padding:14px 20px;
+    border-radius:12px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition: transform .1s, filter .15s;
+    width:100%;
+  }
+  button.primary:hover{filter:brightness(1.07);}
+  button.primary:active{transform:scale(0.98);}
+  button.primary:disabled{
+    background:#2b3140;
+    color:#5c6272;
+    cursor:not-allowed;
+  }
+  button.secondary{
+    background:transparent;
+    color:var(--muted);
+    border:1px solid #3a4150;
+    padding:10px 16px;
+    border-radius:10px;
+    font-size:13px;
+    cursor:pointer;
+    width:100%;
+  }
+  button.secondary:hover{
+    color:var(--text);
+    border-color:#565f70;
+  }
+  .divider{
+    height:1px;
+    background:#262b36;
+    margin:2px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Editor de Plantilla de Perfil</h1>
+    <p>Sube tu foto, ajusta el encuadre y personaliza el título — luego descarga tu imagen final.</p>
+  </header>
+
+  <div class="layout">
+    <div class="stage">
+      <div class="canvas-holder" id="canvasHolder">
+        <canvas id="canvas" width="640" height="680"></canvas>
+      </div>
+      <div class="hint" id="dragHint">Arrastra la foto para moverla dentro del círculo</div>
+      <div class="zoom-row">
+        <label for="zoom">Zoom</label>
+        <input type="range" id="zoom" min="100" max="300" value="100">
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="field">
+        <label>Fotografía</label>
+        <div class="upload-box" id="uploadBox">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8B93A3" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
+          <div class="u-title">Haz clic o arrastra una imagen aquí</div>
+          <div class="u-sub">PNG o JPG · se recorta en círculo automáticamente</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*">
+      </div>
+
+      <div class="field">
+        <label for="titleInput">Título</label>
+        <input type="text" id="titleInput" value="Title" maxlength="40" placeholder="Escribe el título">
+        <div class="char-count"><span id="charCount">5</span>/40</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <button class="primary" id="downloadBtn" disabled>Descargar imagen</button>
+      <button class="secondary" id="resetBtn">Restablecer encuadre</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+// Layout geometry (proportional to canvas)
+const circle = { cx: W/2, cy: 300, r: 268 };
+const ringWidth = 16;
+const pill = { cx: W/2, cy: 560, w: 320, h: 118, r: 59 };
+const badge = { cx: W/2, cy: 468, w: 148, h: 62, r: 31 };
+
+let img = null;
+let imgState = { scale: 1, offsetX: 0, offsetY: 0, baseScale: 1 };
+let dragging = false, lastX = 0, lastY = 0;
+let title = "Title";
+
+const fileInput = document.getElementById('fileInput');
+const uploadBox = document.getElementById('uploadBox');
+const zoomSlider = document.getElementById('zoom');
+const titleInput = document.getElementById('titleInput');
+const charCount = document.getElementById('charCount');
+const downloadBtn = document.getElementById('downloadBtn');
+const resetBtn = document.getElementById('resetBtn');
+const dragHint = document.getElementById('dragHint');
+
+uploadBox.addEventListener('click', () => fileInput.click());
+uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.classList.add('drag'); });
+uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('drag'));
+uploadBox.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadBox.classList.remove('drag');
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => {
+  if (e.target.files && e.target.files[0]) loadImage(e.target.files[0]);
+});
+
+function loadImage(file) {
+  if (!file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const image = new Image();
+    image.onload = () => {
+      img = image;
+      const diameter = circle.r * 2;
+      imgState.baseScale = Math.max(diameter / img.width, diameter / img.height);
+      imgState.scale = 1;
+      imgState.offsetX = 0;
+      imgState.offsetY = 0;
+      zoomSlider.value = 100;
+      downloadBtn.disabled = false;
+      draw();
+    };
+    image.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+zoomSlider.addEventListener('input', () => {
+  imgState.scale = zoomSlider.value / 100;
+  clampOffset();
+  draw();
+});
+
+resetBtn.addEventListener('click', () => {
+  if (!img) return;
+  imgState.scale = 1;
+  imgState.offsetX = 0;
+  imgState.offsetY = 0;
+  zoomSlider.value = 100;
+  draw();
+});
+
+titleInput.addEventListener('input', () => {
+  title = titleInput.value || "Title";
+  charCount.textContent = titleInput.value.length;
+  draw();
+});
+charCount.textContent = titleInput.value.length;
+
+// Drag to reposition
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = W / rect.width, scaleY = H / rect.height;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+}
+
+canvas.addEventListener('mousedown', e => { if (!img) return; dragging = true; const p = getPos(e); lastX = p.x; lastY = p.y; });
+window.addEventListener('mousemove', e => {
+  if (!dragging || !img) return;
+  const p = getPos(e);
+  imgState.offsetX += (p.x - lastX);
+  imgState.offsetY += (p.y - lastY);
+  lastX = p.x; lastY = p.y;
+  clampOffset();
+  draw();
+});
+window.addEventListener('mouseup', () => dragging = false);
+
+canvas.addEventListener('touchstart', e => { if (!img) return; dragging = true; const p = getPos(e); lastX = p.x; lastY = p.y; }, {passive:true});
+canvas.addEventListener('touchmove', e => {
+  if (!dragging || !img) return;
+  const p = getPos(e);
+  imgState.offsetX += (p.x - lastX);
+  imgState.offsetY += (p.y - lastY);
+  lastX = p.x; lastY = p.y;
+  clampOffset();
+  draw();
+}, {passive:true});
+canvas.addEventListener('touchend', () => dragging = false);
+
+canvas.addEventListener('wheel', e => {
+  if (!img) return;
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? -5 : 5;
+  let newVal = Math.min(300, Math.max(100, parseInt(zoomSlider.value) + delta));
+  zoomSlider.value = newVal;
+  imgState.scale = newVal / 100;
+  clampOffset();
+  draw();
+}, { passive:false });
+
+function clampOffset() {
+  if (!img) return;
+  const diameter = circle.r * 2;
+  const drawScale = imgState.baseScale * imgState.scale;
+  const dw = img.width * drawScale, dh = img.height * drawScale;
+  const maxOffX = Math.max(0, (dw - diameter) / 2);
+  const maxOffY = Math.max(0, (dh - diameter) / 2);
+  imgState.offsetX = Math.min(maxOffX, Math.max(-maxOffX, imgState.offsetX));
+  imgState.offsetY = Math.min(maxOffY, Math.max(-maxOffY, imgState.offsetY));
+}
+
+function drawCheckerboard(x, y, size) {
+  const cell = 16;
+  for (let i = 0; i < size / cell; i++) {
+    for (let j = 0; j < size / cell; j++) {
+      ctx.fillStyle = (i + j) % 2 === 0 ? '#ECECEC' : '#D9D9D9';
+      ctx.fillRect(x + i * cell, y + j * cell, cell, cell);
+    }
+  }
+}
+
+function drawIcon(type, cx, cy, s) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  if (type === 'purple') {
+    ctx.fillStyle = '#7C4DFF';
+    ctx.beginPath();
+    ctx.arc(0, 0, s * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.lineWidth = s * 0.11;
+    ctx.beginPath();
+    ctx.arc(0, 0, s * 0.26, -Math.PI * 0.65, Math.PI * 0.85);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(s*0.11, -s*0.19, s*0.06, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fill();
+  } else if (type === 'green') {
+    ctx.fillStyle = '#22C55E';
+    ctx.beginPath();
+    ctx.moveTo(0, -s * 0.52);
+    ctx.lineTo(s * 0.5, 0);
+    ctx.lineTo(0, s * 0.52);
+    ctx.lineTo(-s * 0.5, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+    ctx.lineWidth = s * 0.045;
+    ctx.beginPath();
+    ctx.moveTo(0, -s * 0.52);
+    ctx.lineTo(0, s * 0.52);
+    ctx.moveTo(-s * 0.5, 0);
+    ctx.lineTo(s * 0.5, 0);
+    ctx.stroke();
+  } else if (type === 'blue') {
+    ctx.fillStyle = '#3B82F6';
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.46, -s * 0.42);
+    ctx.lineTo(s * 0.5, 0);
+    ctx.lineTo(-s * 0.46, s * 0.42);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function roundRectPath(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function wrapLines(text, maxWidth, font) {
+  ctx.font = font;
+  const words = text.split(' ');
+  let lines = [];
+  let current = '';
+  for (const w of words) {
+    const test = current ? current + ' ' + w : w;
+    if (ctx.measureText(test).width > maxWidth && current) {
+      lines.push(current);
+      current = w;
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // circle clip + photo or checkerboard
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(circle.cx, circle.cy, circle.r, 0, Math.PI * 2);
+  ctx.clip();
+
+  if (img) {
+    const drawScale = imgState.baseScale * imgState.scale;
+    const dw = img.width * drawScale, dh = img.height * drawScale;
+    const dx = circle.cx - dw / 2 + imgState.offsetX;
+    const dy = circle.cy - dh / 2 + imgState.offsetY;
+    ctx.drawImage(img, dx, dy, dw, dh);
+  } else {
+    drawCheckerboard(circle.cx - circle.r, circle.cy - circle.r, circle.r * 2);
+  }
+  ctx.restore();
+
+  // green ring
+  ctx.beginPath();
+  ctx.arc(circle.cx, circle.cy, circle.r - ringWidth / 2, 0, Math.PI * 2);
+  ctx.lineWidth = ringWidth;
+  ctx.strokeStyle = '#1FD673';
+  ctx.stroke();
+
+  // pill
+  roundRectPath(pill.cx - pill.w / 2, pill.cy - pill.h / 2, pill.w, pill.h, pill.r);
+  ctx.fillStyle = '#232733';
+  ctx.fill();
+
+  // icon badge
+  roundRectPath(badge.cx - badge.w / 2, badge.cy - badge.h / 2, badge.w, badge.h, badge.r);
+  ctx.fillStyle = '#232733';
+  ctx.fill();
+
+  const iconSize = 34;
+  const spacing = 44;
+  drawIcon('purple', badge.cx - spacing, badge.cy, iconSize);
+  drawIcon('green', badge.cx, badge.cy, iconSize);
+  drawIcon('blue', badge.cx + spacing, badge.cy, iconSize);
+
+  // title text (wraps to max 2 lines, shrinks to fit)
+  let fontSize = 30;
+  let lines = [];
+  const maxTextWidth = pill.w - 48;
+  while (fontSize > 16) {
+    lines = wrapLines(title.toUpperCase() === title ? title : title, maxTextWidth, `700 ${fontSize}px Segoe UI, Arial, sans-serif`);
+    if (lines.length <= 2) break;
+    fontSize -= 1;
+  }
+  if (lines.length > 2) lines = lines.slice(0, 2);
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = `700 ${fontSize}px Segoe UI, Arial, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const lineHeight = fontSize * 1.18;
+  const startY = pill.cy - ((lines.length - 1) * lineHeight) / 2;
+  lines.forEach((line, i) => {
+    ctx.fillText(line, pill.cx, startY + i * lineHeight);
+  });
+}
+
+downloadBtn.addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = 'perfil-plantilla.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+draw();
+</script>
+</body>
+</html>
