@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/x-icon" href="https://d14bodb4yrsx8y.cloudfront.net/static/favicon.ico">  
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Editor de Plantilla de Perfil</title>
+<title>Crea tu foto de perfil</title>
 <style>
   :root{
     --green:#1FD673;
@@ -257,7 +257,19 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const W = canvas.width, H = canvas.height;
+const imageMap = {
+    purple: "https://public.test.cambioseguro.com/favicon.png",
+    green: "https://public.test.cambioseguro.com/favicon.png",
+    blue: "https://public.test.cambioseguro.com/favicon.png"
+};
+const icons = {};
 
+for (const key in imageMap) {
+    const img = new Image();
+    img.src = imageMap[key];
+    icons[key] = img;
+}
+  
 // Layout geometry (proportional to canvas)
 const circle = { cx: W/2, cy: 300, r: 268 };
 const ringWidth = 16;
@@ -403,13 +415,31 @@ function drawCheckerboard(x, y, size) {
     }
   }
 }
+function drawIcon(type, cx, cy, s) {
+    const img = icons[type];
+    if (!img) return;
 
+    ctx.drawImage(img, cx - s/2, cy - s/2, s, s);
+}
+ /*  
 function drawIcon(type, cx, cy, s) {
   ctx.save();
   ctx.translate(cx, cy);
-  if (type === 'purple') {
-    /*ctx.appendChild(miImagen);
+  
+   if (type === "purple") {
+    ctx.drawImage(imgPurple, cx - s/2, cy - s/2, s, s);
+
+  } else if (type === "green") {
+    ctx.drawImage(imgGreen, cx - s/2, cy - s/2, s, s);
+
+  } else if (type === "blue") {
+    ctx.drawImage(imgBlue, cx - s/2, cy - s/2, s, s);
+  }
+
+  
+ if (type === 'purple') {
     
+    ctx.appendChild(miImagen);
     // 1. Crear el elemento img
 const miImagen = document.createElement("img");
 
@@ -420,7 +450,7 @@ miImagen.alt = "Ejemplo de imagen";
 // 3. Seleccionar el contenedor en el HTML e insertar la imagen
 const contenedor = document.getElementById("contenedor");
 contenedor.appendChild(miImagen);
-     */
+     
     ctx.fillStyle = '#7C4DFF';
     ctx.beginPath();
     ctx.arc(0, 0, s * 0.5, 0, Math.PI * 2);
@@ -464,7 +494,7 @@ contenedor.appendChild(miImagen);
   }
   ctx.restore();
 }
-
+*/
 function roundRectPath(x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
