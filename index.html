@@ -418,18 +418,7 @@ function drawIcon(type, cx, cy, s) {
 function drawIcon(type, cx, cy, s) {
   ctx.save();
   ctx.translate(cx, cy);
-  
-   if (type === "purple") {
-    ctx.drawImage(imgPurple, cx - s/2, cy - s/2, s, s);
-
-  } else if (type === "green") {
-    ctx.drawImage(imgGreen, cx - s/2, cy - s/2, s, s);
-
-  } else if (type === "blue") {
-    ctx.drawImage(imgBlue, cx - s/2, cy - s/2, s, s);
-  }
-
-  
+    
  if (type === 'purple') {
       
     ctx.fillStyle = '#7C4DFF';
