@@ -262,13 +262,6 @@ const imageMap = {
     green: "https://public.test.cambioseguro.com/favicon.png",
     blue: "https://public.test.cambioseguro.com/favicon.png"
 };
-const icons = {};
-
-for (const key in imageMap) {
-    const img = new Image();
-    img.src = imageMap[key];
-    icons[key] = img;
-}
   
 // Layout geometry (proportional to canvas)
 const circle = { cx: W/2, cy: 300, r: 268 };
@@ -414,14 +407,14 @@ function drawCheckerboard(x, y, size) {
       ctx.fillRect(x + i * cell, y + j * cell, cell, cell);
     }
   }
-}
+}/*  
 function drawIcon(type, cx, cy, s) {
     const img = icons[type];
     if (!img) return;
 
     ctx.drawImage(img, cx - s/2, cy - s/2, s, s);
-}
- /*  
+}*/
+ 
 function drawIcon(type, cx, cy, s) {
   ctx.save();
   ctx.translate(cx, cy);
@@ -438,19 +431,7 @@ function drawIcon(type, cx, cy, s) {
 
   
  if (type === 'purple') {
-    
-    ctx.appendChild(miImagen);
-    // 1. Crear el elemento img
-const miImagen = document.createElement("img");
-
-// 2. Asignar los atributos necesarios
-miImagen.src = "https://d14bodb4yrsx8y.cloudfront.net/static/favicon.ico";
-miImagen.alt = "Ejemplo de imagen";
-
-// 3. Seleccionar el contenedor en el HTML e insertar la imagen
-const contenedor = document.getElementById("contenedor");
-contenedor.appendChild(miImagen);
-     
+      
     ctx.fillStyle = '#7C4DFF';
     ctx.beginPath();
     ctx.arc(0, 0, s * 0.5, 0, Math.PI * 2);
@@ -494,7 +475,7 @@ contenedor.appendChild(miImagen);
   }
   ctx.restore();
 }
-*/
+
 function roundRectPath(x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
