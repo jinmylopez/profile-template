@@ -220,6 +220,8 @@
     background:#262b36;
     margin:2px 0;
   }
+
+  /*<div class="hint" id="dragHint">Arrastra la foto para moverla dentro del círculo</div>*/
 </style>
 </head>
 <body>
@@ -241,37 +243,28 @@
         </div>
         <input type="file" id="fileInput" accept="image/*">
       </div>
-
       <div class="field">
         <label for="titleInput">Tu cargo</label>
         <input type="text" id="titleInput" value="" maxlength="40" placeholder="Escribe tu cargo">
         <div class="char-count"><span id="charCount">5</span>/40</div>
       </div>
-
-      <div class="divider"></div>
-
-      
+      <div class="divider"></div>      
     </div>
     <div class="stage">
     <p>2. Ajusta el encuadre y luego descarga tu imagen</p>
-
       <div class="canvas-holder" id="canvasHolder">
         <canvas id="canvas" width="640" height="680"></canvas>
       </div>
-      <div class="hint" id="dragHint">Arrastra la foto para moverla dentro del círculo</div>
+      
       <div class="zoom-row">
-        <label for="zoom">Zoom</label>
-        <input type="range" id="zoom" min="100" max="300" value="100">
-        
+        <label for="zoom">Tamaño de la imagen</label>
+        <input type="range" id="zoom" min="100" max="300" value="100">        
       </div>
       <button class="primary" id="downloadBtn" disabled>Descargar imagen</button>
       <button class="secondary" id="resetBtn">Restablecer encuadre</button>
-    </div>
-
-    
+    </div>    
   </div>
 </div>
-
 <script>
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
