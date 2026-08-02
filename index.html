@@ -49,7 +49,7 @@
   }
   .layout{
     display:grid;
-    grid-template-columns: 1fr 380px;
+    grid-template-columns: 380px 1fr;
     gap:28px;
     align-items:flex-start;
   }
@@ -213,22 +213,11 @@
 <div class="wrap">
   <header>
     <h1>Editor de Plantilla de Perfil</h1>
-    <p>Sube tu foto, ajusta el encuadre y personaliza el título — luego descarga tu imagen final.</p>
   </header>
 
   <div class="layout">
-    <div class="stage">
-      <div class="canvas-holder" id="canvasHolder">
-        <canvas id="canvas" width="640" height="680"></canvas>
-      </div>
-      <div class="hint" id="dragHint">Arrastra la foto para moverla dentro del círculo</div>
-      <div class="zoom-row">
-        <label for="zoom">Zoom</label>
-        <input type="range" id="zoom" min="100" max="300" value="100">
-      </div>
-    </div>
-
     <div class="panel">
+    <p>1. Sube tu foto, y personaliza el cargo</p>
       <div class="field">
         <label>Fotografía</label>
         <div class="upload-box" id="uploadBox">
@@ -247,9 +236,25 @@
 
       <div class="divider"></div>
 
+      
+    </div>
+    <div class="stage">
+    <p>2. Ajusta el encuadre y luego descarga tu imagen</p>
+
+      <div class="canvas-holder" id="canvasHolder">
+        <canvas id="canvas" width="640" height="680"></canvas>
+      </div>
+      <div class="hint" id="dragHint">Arrastra la foto para moverla dentro del círculo</div>
+      <div class="zoom-row">
+        <label for="zoom">Zoom</label>
+        <input type="range" id="zoom" min="100" max="300" value="100">
+        
+      </div>
       <button class="primary" id="downloadBtn" disabled>Descargar imagen</button>
       <button class="secondary" id="resetBtn">Restablecer encuadre</button>
     </div>
+
+    
   </div>
 </div>
 
