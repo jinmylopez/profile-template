@@ -31,17 +31,24 @@
   .wrap{
     max-width:1080px;
     margin:0 auto;
-    padding:40px 24px 80px;
+    padding:20px 24px 80px;
   }
   header{
-    text-align:center;
-    margin-bottom:36px;
+    text-align:left;
+    margin: bottom 36px;
+    display:inline-block;
   }
   header h1{
-    font-size:28px;
-    margin:0 0 8px;
+    font-size:20px;
+    font-weight:500;
+    margin:0 0 20px;
     letter-spacing:-0.02em;
   }
+  header img{
+    width:120px;
+    margin-bottom:20px;
+  }
+  
   header p{
     color:var(--muted);
     margin:0;
@@ -49,7 +56,7 @@
   }
   .layout{
     display:grid;
-    grid-template-columns: 380px 1fr;
+    grid-template-columns: 570px 1fr;
     gap:28px;
     align-items:flex-start;
   }
@@ -212,7 +219,8 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Editor de Plantilla de Perfil</h1>
+    <img src="https://d14bodb4yrsx8y.cloudfront.net/static/logo.svg" alt="" srcset="">
+    <h1>Crea tu foto de perfil</h1>
   </header>
 
   <div class="layout">
