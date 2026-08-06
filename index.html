@@ -69,6 +69,11 @@
   @media (max-width: 820px){
     .layout{grid-template-columns: 1fr;}
   }
+  .layout p{
+    font-size:16px;
+    color:var(--text);
+    margin:0;
+  }
   .stage{
     background:var(--panel);
     border-radius:20px;
@@ -269,11 +274,19 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const W = canvas.width, H = canvas.height;
-const imageMap = {
-    purple: "https://public.test.cambioseguro.com/favicon.png",
-    green: "https://public.test.cambioseguro.com/favicon.png",
-    blue: "https://public.test.cambioseguro.com/favicon.png"
+
+const ICON_URLS = {
+  purple: 'https://public.test.cambioseguro.com/favicon.png',
+  green: 'https://public.test.cambioseguro.com/favicon.png',
+  blue: 'https://public.test.cambioseguro.com/favicon.png'
 };
+
+const iconImages = {};
+Object.entries(ICON_URLS).forEach(([key, url]) => {
+  const image = new Image();
+  image.src = url;
+  iconImages[key] = image;
+});
   
 // Layout geometry (proportional to canvas)
 const circle = { cx: W/2, cy: 300, r: 268 };
@@ -294,12 +307,6 @@ const charCount = document.getElementById('charCount');
 const downloadBtn = document.getElementById('downloadBtn');
 const resetBtn = document.getElementById('resetBtn');
 const dragHint = document.getElementById('dragHint');
-
-// 1. Crear el elemento img
-const miImagen = document.createElement("imagen");
-// 2. Asignar los atributos necesarios
-miImagen.src = "https://d14bodb4yrsx8y.cloudfront.net/static/favicon.ico";
-miImagen.alt = "Ejemplo de imagen";
 
 uploadBox.addEventListener('click', () => fileInput.click());
 uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.classList.add('drag'); });
@@ -419,61 +426,25 @@ function drawCheckerboard(x, y, size) {
       ctx.fillRect(x + i * cell, y + j * cell, cell, cell);
     }
   }
-}/*  
-function drawIcon(type, cx, cy, s) {
-    const img = icons[type];
-    if (!img) return;
+}
+/*
 
-    ctx.drawImage(img, cx - s/2, cy - s/2, s, s);
-}*/
+*/
  
-function drawIcon(type, cx, cy, s) {
+function drawIcon(type, cx, cy, s = 34) {
+  const icon = iconImages[type];
   ctx.save();
   ctx.translate(cx, cy);
-    
- if (type === 'purple') {
-      
-    ctx.fillStyle = '#7C4DFF';
+
+  if (icon && icon.complete) {
+    ctx.drawImage(icon, -s / 2, -s / 2, s, s);
+  } else {
     ctx.beginPath();
-    ctx.arc(0, 0, s * 0.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-    ctx.lineWidth = s * 0.11;
-    ctx.beginPath();
-    ctx.arc(0, 0, s * 0.26, -Math.PI * 0.65, Math.PI * 0.85);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(s*0.11, -s*0.19, s*0.06, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.fill();
-    
-    
-  } else if (type === 'green') {
-    ctx.fillStyle = '#22C55E';
-    ctx.beginPath();
-    ctx.moveTo(0, -s * 0.52);
-    ctx.lineTo(s * 0.5, 0);
-    ctx.lineTo(0, s * 0.52);
-    ctx.lineTo(-s * 0.5, 0);
-    ctx.closePath();
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
-    ctx.lineWidth = s * 0.045;
-    ctx.beginPath();
-    ctx.moveTo(0, -s * 0.52);
-    ctx.lineTo(0, s * 0.52);
-    ctx.moveTo(-s * 0.5, 0);
-    ctx.lineTo(s * 0.5, 0);
-    ctx.stroke();
-  } else if (type === 'blue') {
-    ctx.fillStyle = '#3B82F6';
-    ctx.beginPath();
-    ctx.moveTo(-s * 0.46, -s * 0.42);
-    ctx.lineTo(s * 0.5, 0);
-    ctx.lineTo(-s * 0.46, s * 0.42);
-    ctx.closePath();
+    ctx.arc(0, 0, s / 2, 0, Math.PI * 2);
+    ctx.fillStyle = type === 'purple' ? '#7C4DFF' : type === 'green' ? '#22C55E' : '#3B82F6';
     ctx.fill();
   }
+
   ctx.restore();
 }
 
