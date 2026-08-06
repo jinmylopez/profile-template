@@ -277,8 +277,8 @@ const W = canvas.width, H = canvas.height;
 
 const ICON_URLS = {
   purple: 'https://public.test.cambioseguro.com/favicon.png',
-  green: 'https://public.test.cambioseguro.com/favicon.png',
-  blue: 'https://public.test.cambioseguro.com/favicon.png'
+  green: 'https://d14bodb4yrsx8y.cloudfront.net/static/favicon.ico',
+  blue: 'https://client.tandia.pe/static/icon/favicon.png'
 };
 
 const iconImages = {};
@@ -435,6 +435,8 @@ function drawIcon(type, cx, cy, s = 34) {
   const icon = iconImages[type];
   ctx.save();
   ctx.translate(cx, cy);
+
+  iconImages['purple'].onload = () => draw();
 
   if (icon && icon.complete) {
     ctx.drawImage(icon, -s / 2, -s / 2, s, s);
